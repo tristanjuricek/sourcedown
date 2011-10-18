@@ -1,0 +1,3 @@
+# I'm a typical documentation file
+
+Why not just allow normal markdown files too?

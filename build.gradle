@@ -1,0 +1,23 @@
+apply plugin: 'scala'
+
+repositories {
+    mavenCentral()
+    mavenRepo urls: uri('http://scala-tools.org/repo-releases')
+}
+
+dependencies {
+    // Libraries needed to run the scala tools
+    scalaTools 'org.scala-lang:scala-compiler:2.9.1'
+    scalaTools 'org.scala-lang:scala-library:2.9.1'
+
+    // Libraries needed for scala api
+    compile 'org.scala-lang:scala-library:2.9.1'
+    compile 'com.tristanhunt:knockoff_2.9.1:0.8.0-16'
+    compile 'org.fusesource.scalate:scalate-core:1.5.2'
+}
+
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest { attributes 'Main-Class': 'com.tristanhunt.sourcedown.Sourcedown' }
+}
