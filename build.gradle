@@ -14,6 +14,9 @@ dependencies {
     compile 'org.scala-lang:scala-library:2.9.1'
     compile 'com.tristanhunt:knockoff_2.9.1:0.8.0-16'
     compile 'org.fusesource.scalate:scalate-core:1.5.2'
+
+    testCompile 'com.github.scala-incubator.io:scala-io-core_2.9.1:0.2.0'
+    testCompile 'com.github.scala-incubator.io:scala-io-file_2.9.1:0.2.0'
 }
 
 
@@ -21,3 +24,11 @@ jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest { attributes 'Main-Class': 'com.tristanhunt.sourcedown.Sourcedown' }
 }
+
+sourceSets.test.runtimeClasspath += files("build/classes/test")
+
+task(runFunctionalTests, dependsOn: [assemble, testClasses], type: JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    main = "com.tristanhunt.sourcedown.RunSourcedownTests"
+}
+runFunctionalTests.description = "Executes the Sourcedown test framework."
