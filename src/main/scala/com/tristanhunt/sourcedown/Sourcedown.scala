@@ -32,6 +32,7 @@ package com.tristanhunt.sourcedown
 
 import scala.collection.mutable.ListBuffer
 import scalax.file._
+import scalax.io._
 import scalax.file.PathMatcher._
 import scalax.file.PathMatcher.StandardSyntax.REGEX
 import java.util.regex.Pattern.quote
@@ -40,7 +41,8 @@ class Sourcedown(
   val dir: String, 
   val onlySubs: Seq[String], 
   val output: String,
-  val templatePath: String) {
+  val templatePath: String,
+  val resources: Seq[String]) {
 
   /*
     Sourcedown:
@@ -75,12 +77,20 @@ class Sourcedown(
     fileIterator.foreach {
       case (x,y) => applyTemplate.apply(x,y)
     }
+
+    // Copy resources to a "output/res" folder
+    resources.foreach( copyToRes )
   }
 
   private def createMatcher(regex: String): PathMatcher = {
     return scalax.file.FileSystem.default.matcher(regex, REGEX) 
   }
 
+  private def copyToRes(input: String) {
+    val resource = Resource.fromClasspath( input )
+    val outputPath = Path(output) / "res" / Path(input).name
+    outputPath.write( resource.chars )
+  }
 }
 
 object Sourcedown {
@@ -102,6 +112,8 @@ object Sourcedown {
     var root:String = "."
     var templatePath:String = "com/tristanhunt/sourcedown/template.ssp"
     var onlySubs:ListBuffer[String] = ListBuffer.empty
+    var resources:ListBuffer[String] = ListBuffer(
+      "com/tristanhunt/sourcedown/res/style.css")
 
     val iter = args.iterator
     while (iter.hasNext) {
@@ -113,7 +125,7 @@ object Sourcedown {
       }
     }
 
-    createSourcedown(root, onlySubs, output, templatePath).run
+    createSourcedown(root, onlySubs, output, templatePath, resources).run
   }
 
   private def check(iter: Iterator[String])(fxn: () => Unit) {
@@ -146,8 +158,9 @@ object Sourcedown {
   }
 
   def createSourcedown(root: String, ignoreSubs: Seq[String], 
-                       output: String, templatePath: String): Sourcedown = {
-    return new Sourcedown(root, ignoreSubs, output, templatePath);
+                       output: String, templatePath: String,
+                       resources: Seq[String]): Sourcedown = {
+    return new Sourcedown(root, ignoreSubs, output, templatePath, resources);
   }
 }
 
