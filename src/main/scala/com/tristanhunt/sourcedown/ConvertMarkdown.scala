@@ -14,12 +14,11 @@ package com.tristanhunt.sourcedown
 import scala.xml.Node
 import com.tristanhunt.knockoff.DefaultDiscounter
 
-object KnockoffConversion {
+object ConvertMarkdown {
     
   var discounter = DefaultDiscounter
 
-  def toXHTML(markdown: String): Node = {
+  def apply(markdown: String): Node = {
     discounter.toXHTML( discounter.knockoff(markdown) )
   }
-         
 }

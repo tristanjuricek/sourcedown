@@ -19,19 +19,19 @@
 
 package com.tristanhunt.sourcedown
 
-object Rebaser {
+object Rebase {
 
-  var instance = new Rebaser
+  var default = new Rebase
 
-  def rebase(sections: Seq[Section], sourceClass: String = null): String =
-    instance.rebase(sections, sourceClass)
+  def apply(sections: Seq[Section], sourceClass: String = null): String =
+    default.apply(sections, sourceClass)
 }
 
-class Rebaser {
+class Rebase {
   
   var tabWidth = 4
 
-  def rebase(sections: Seq[Section], sourceClass: String): String = {
+  def apply(sections: Seq[Section], sourceClass: String): String = {
     sections.map(toMarkdown(_, sourceClass)).mkString("\n")
   }
 
@@ -68,13 +68,16 @@ class Rebaser {
     class attribute from being applied.
   */
   private def wrapSource(source: String, sourceClass: String) : String = {
+    // TODO this seems buggy, I don't see the source class and why do I need to 
+    // trim?
     val wrapped =
-      <pre><code class={sourceClass}>{source}</code></pre>
+      <pre><code>{source}</code></pre>
+//      <pre><code class={sourceClass}>{source}</code></pre>
     xml.Utility.toXML(wrapped).toString
   }
 
   private def convertSingleLineComment(source: String, start: String): String = {
-    source.substring(start.length).trim
+    "\n" + source.substring(start.length).trim + "\n"
   }
 
   /*
@@ -103,7 +106,11 @@ class Rebaser {
   */
   private def stripMultiLineComment(source: String, start: String, 
                     end: String): String = {
-    var lines = source.substring(start.length, source.length - end.length)
+    var startIndex = start.length
+    if (start == "/*" && source.startsWith("/**")) {
+      startIndex += 1
+    }
+    var lines = source.substring(startIndex, source.length - end.length)
               .replace("\t", " " * tabWidth /* FIXME */)
               .split("\n")
     if (lines.length > 2) {
@@ -115,7 +122,7 @@ class Rebaser {
         lines = lines.dropRight(1)
       
       // Look at the rest of the content to see if we notice a prefix.
-      findPrefix(lines.drop(1).dropRight(1), start).foreach { prefix =>
+      findPrefix(lines, start).foreach { prefix =>
         lines = lines.map( line => line.drop(prefix.length) )
       }
     }

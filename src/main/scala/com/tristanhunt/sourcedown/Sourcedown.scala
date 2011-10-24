@@ -31,8 +31,16 @@
 package com.tristanhunt.sourcedown
 
 import scala.collection.mutable.ListBuffer
+import scalax.file._
+import scalax.file.PathMatcher._
+import scalax.file.PathMatcher.StandardSyntax.REGEX
+import java.util.regex.Pattern.quote
 
-class Sourcedown(val root: String, val ignoreSubs: Seq[String], val output: String) {
+class Sourcedown(
+  val dir: String, 
+  val onlySubs: Seq[String], 
+  val output: String,
+  val templatePath: String) {
 
   /*
     Sourcedown:
@@ -47,8 +55,32 @@ class Sourcedown(val root: String, val ignoreSubs: Seq[String], val output: Stri
     right now. This allows the template to reference a tree of stuff.
    */
   def run {
+    val root = Path(dir)
+
+    val subs = if (onlySubs.isEmpty) Seq(".") else onlySubs
+
+    var fileIterator = 
+      for {
+        subdir <- subs.map(root / _)
+        file <- subdir.descendants(IsFile)
+        sections = ParseComments(file)
+        markdown = Rebase(sections)
+        html = ConvertMarkdown(markdown)
+      } yield (file, html);
     
+    var pathToHTML = Map(fileIterator.toSeq: _*)
+
+    var applyTemplate = TemplateFactory(pathToHTML, output, root, templatePath)
+
+    fileIterator.foreach {
+      case (x,y) => applyTemplate.apply(x,y)
+    }
   }
+
+  private def createMatcher(regex: String): PathMatcher = {
+    return scalax.file.FileSystem.default.matcher(regex, REGEX) 
+  }
+
 }
 
 object Sourcedown {
@@ -68,18 +100,20 @@ object Sourcedown {
 
     var output:String = ""
     var root:String = "."
-    var ignoreFolders:ListBuffer[String] = ListBuffer.empty
+    var templatePath:String = "com/tristanhunt/sourcedown/template.ssp"
+    var onlySubs:ListBuffer[String] = ListBuffer.empty
 
     val iter = args.iterator
     while (iter.hasNext) {
       iter.next match {
-        case "-r" => check(iter)( () => { root = iter.next } )
-        case "-i" => check(iter)( () => { ignoreFolders :+ iter.next } )
-        case str:String => output = str
+        case "-d" => check(iter)( () => { root = iter.next } )
+        case "-s" => check(iter)( () => { onlySubs += iter.next } )
+        case "-o" => check(iter)( () => { output = iter.next } )
+        case str:String => println("ignoring " + str)
       }
     }
 
-    createSourcedown(root, ignoreFolders, output).run
+    createSourcedown(root, onlySubs, output, templatePath).run
   }
 
   private def check(iter: Iterator[String])(fxn: () => Unit) {
@@ -87,7 +121,7 @@ object Sourcedown {
       fxn()
     else {
       printOptions
-      sys.error("Invalid argument sequence, one of the required values is missing")
+      sys.error("Missing a parameter after one of the options")
     }
   }
 
@@ -97,16 +131,13 @@ object Sourcedown {
   */
   def printOptions {
     var helpString = """
-      |Usage: java -jar sourcedown.jar [-h] [-r DIR] [-i DIR1] [-i DIR2] OUTPUT
+      |Usage: java -jar sourcedown.jar [-h] [-d DIR] [-s SUB] [-t TEMPLATE] OUTPUT
       |
       |Options:
       |
-      |   -i DIR      Ignore a particular folder pattern. This will be
-      |               applied from the beginning of the string. Ergo,
-      |               "src/main" will ignore "src/main/sh/File.sh" but not
-      |               "foo/src/main/sh/File.sh". Can be repeated.
+      |   -s DIR      Only include files from this subdirectory. Can be repeated.
       |
-      |   -r DIR      Set the "root" of the project. Default is the current 
+      |   -d DIR      Set the "root" of the project. Default is the current 
       |               working directory.
       |
       |   -h          Print usage.
@@ -114,8 +145,9 @@ object Sourcedown {
     System.err.println(helpString);
   }
 
-  def createSourcedown(root: String, ignoreSubs: Seq[String], output: String): Sourcedown = {
-    return new Sourcedown(root, ignoreSubs, output);
+  def createSourcedown(root: String, ignoreSubs: Seq[String], 
+                       output: String, templatePath: String): Sourcedown = {
+    return new Sourcedown(root, ignoreSubs, output, templatePath);
   }
 }
 

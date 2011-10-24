@@ -22,15 +22,14 @@
 
 package com.tristanhunt.sourcedown
 
-import scala.collection.mutable.{ Seq => MSeq, ListBuffer }
+import scala.collection.mutable.{ ListBuffer }
 import scala.util.parsing.input.{ Reader, CharSequenceReader }
+import scalax.file._
 
-object CommentParser {
+object ParseComments {
   
-  def parse(sourcePath: SourcePath): Seq[Section] = {
-    var codeStyle = CodeStyle.fromExtension(sourcePath.extension)
-    parse(sourcePath, codeStyle)
-  }
+  def apply(path: Path): Seq[Section] =
+    apply(path, CodeStyle(path.extension.getOrElse("unknown")))
 
   /*
     Scans through the entire source file and tries to match it using the
@@ -38,20 +37,27 @@ object CommentParser {
 
     This is actually the starting method that manages the resources in use.
   */
-  def parse(sourcePath: SourcePath, codeStyle: CodeStyle): Seq[Section] = {
-    
+  def apply(path: Path, styleOpt: Option[CodeStyle]): Seq[Section] = {
+
     // Read all characters in the stream
     // This will use the system's default encoding. Might be a problem.
-    var content = 
-      io.Source.fromFile(sourcePath.file).getLines().mkString("\n")
+    var content = path.lines(includeTerminator = true)
+                      .mkString("")
 
-    var reader = new CharSequenceReader(content)
+    styleOpt match {
+      
+      case None =>
+        Seq(Code(content))
 
-    var tokens = new ListBuffer[Section]
+      case Some(codeStyle) =>
 
-    readContent(codeStyle, reader, tokens, new ListBuffer[Char])
+        var reader = new CharSequenceReader(content)
+        var tokens = new ListBuffer[Section]
 
-    return tokens
+        readContent(codeStyle, reader, tokens, new ListBuffer[Char])
+
+        tokens
+    }
   }
 
   /*
@@ -67,18 +73,17 @@ object CommentParser {
     just have to see.        
   */
 
-  private def readContent(codeStyle: CodeStyle, reader: Reader[Char], 
-                          tokens: MSeq[Section], buffer: MSeq[Char]) {
+  def readContent(codeStyle: CodeStyle, reader: Reader[Char], 
+                  tokens: ListBuffer[Section], buffer: ListBuffer[Char]) {
     
+    var pos = reader
+
     if (reader.atEnd) {
-      tokens :+ Code(buffer)
+      tokens += Code(buffer)
       return
     }
 
-    buffer :+ reader.first
-
-    // TODO I don't think these side effects will work may have to put lines
-    // into a subroutine
+    buffer += pos.first
 
     val singleLine = for {
       start <- codeStyle.singleLineStart
@@ -87,9 +92,15 @@ object CommentParser {
 
     if (!singleLine.isEmpty) {
       var start = singleLine.head
-      tokens :+ Code(buffer.dropRight(start.length))
-      val comment = readComment("\n", reader.rest, tokens, ListBuffer[Char](start:_*))
-      tokens :+ SingleLineComment(comment, start)      
+      val content = buffer.dropRight(start.length)
+      if (!content.isEmpty)
+        tokens += Code(content)
+      buffer.clear
+      val (comment, nextPos) = 
+        readComment("\n", pos.rest, tokens, ListBuffer[Char](start:_*))
+      tokens += SingleLineComment(comment, start)
+      readContent(codeStyle, nextPos, tokens, buffer)   
+      return
     } 
 
     val multiMatches = for {
@@ -99,28 +110,34 @@ object CommentParser {
 
     if (!multiMatches.isEmpty) {
       var (start, end) = multiMatches.head
-      tokens :+ Code(buffer.dropRight(start.length))
-      val comment = readComment(end, reader.rest, tokens, ListBuffer[Char](start:_*))
-      tokens :+ MultiLineComment(comment, start, end)
+      val content = buffer.dropRight(start.length)
+      if (!content.isEmpty)
+        tokens += Code(content)
+      buffer.clear
+      val (comment, nextPos) = 
+        readComment(end, pos.rest, tokens, ListBuffer[Char](start:_*))
+      tokens += MultiLineComment(comment, start, end)
+      readContent(codeStyle, nextPos, tokens, buffer)
+      return
     }
 
-    readContent(codeStyle, if (reader.atEnd) reader else reader.rest, 
-          tokens, buffer)            
+    readContent(codeStyle, if (pos.atEnd) pos else pos.rest, 
+          tokens, buffer)
   }
 
   implicit def toString(seq: Seq[Char]): String =
     new String(seq.toArray)
 
   private def readComment(end: String, reader: Reader[Char], 
-              tokens: MSeq[Section], buffer: MSeq[Char]) : String = {
+              tokens: ListBuffer[Section], buffer: ListBuffer[Char]) : (String, Reader[Char]) = {
     if (reader.atEnd) {
-      return buffer
+      return (buffer, reader)
     }
 
-    buffer :+ reader.first
+    buffer += reader.first
 
     if (buffer.endsWith(end)) {
-      return buffer
+      return (buffer, reader.rest)
     }
 
     readComment(end, reader.rest, tokens, buffer)
