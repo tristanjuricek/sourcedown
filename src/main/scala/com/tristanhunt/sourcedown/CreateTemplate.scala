@@ -49,24 +49,23 @@
 
 package com.tristanhunt.sourcedown
 
-import scala.xml.Node
 import scalax.file._
 import org.fusesource.scalate._
 
 object TemplateFactory {
     
-    def apply(fileInformation: Map[Path, Node], output: Path, subdir: Path,
+    def apply(fileInformation: Map[Path, String], output: Path, subdir: Path,
               templatePath: String): CreateTemplate = {
       new ScalateTemplate(fileInformation, output, subdir, templatePath)
     }
 }
 
-trait CreateTemplate extends Function2[Path, Node, Unit] {
-  def apply(path:Path, html: Node): Unit
+trait CreateTemplate extends Function2[Path, String, Unit] {
+  def apply(path:Path, html: String): Unit
 }
 
 class ScalateTemplate (
-    val fileInformation: Map[Path, Node],
+    val fileInformation: Map[Path, String],
     val outputDir: Path,
     val root: Path,
     val templatePath: String)
@@ -74,18 +73,21 @@ class ScalateTemplate (
   
   val engine = new TemplateEngine
 
-  def apply(path: Path, html: Node) {
+  def apply(path: Path, html: String) {
     val context = Map("path" -> path, 
                       "snippet" -> html,
+                      "subdir" -> subdir(path),
                       "fileInformation" -> fileInformation)
     val content = engine.layout(templatePath, context)
     outputPath(path).write(content)
   }
 
   def outputPath(path: Path): Path = {
-    val subdir = outputDir / path.parent.getOrElse(Path(".")).relativize(root)
-    val outputPath = subdir / (path.name + ".html")
-    outputPath
+    subdir(path) / (path.name + ".html")
+  }
+
+  def subdir(path: Path): Path = {
+    outputDir / path.parent.getOrElse(Path(".")).relativize(root)    
   }
 }
 

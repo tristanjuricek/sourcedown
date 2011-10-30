@@ -16,6 +16,8 @@ dependencies {
     compile 'org.fusesource.scalate:scalate-core:1.5.2'
     compile 'com.github.scala-incubator.io:scala-io-core_2.9.1:0.2.0'
     compile 'com.github.scala-incubator.io:scala-io-file_2.9.1:0.2.0'
+
+    testCompile 'org.scalatest:scalatest_2.9.1:1.6.1'
 }
 
 
@@ -31,3 +33,24 @@ task(runFunctionalTests, dependsOn: [assemble, testClasses], type: JavaExec) {
     main = "com.tristanhunt.sourcedown.RunSourcedownTests"
 }
 runFunctionalTests.description = "Executes the Sourcedown test framework."
+
+
+/*
+    Use scalatest for some BDD
+*/
+task test(overwrite: true, dependsOn: compileTestScala) << {
+    ant.taskdef(
+        name: 'scalatest',
+        classname: 'org.scalatest.tools.ScalaTestAntTask',
+        classpath: configurations.testRuntime.asPath + ':' + compileScala.destinationDir
+    )
+    ant.scalatest(
+        runpath: "build/classes/test", // sourceSets.test.classesDir,
+        haltonfailure: 'true',
+        fork: 'false'
+    ) {
+        reporter(type: 'stdout')
+    }
+}
+
+

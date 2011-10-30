@@ -1,6 +1,10 @@
 /*
   ## Class Sourcedown
 
+  ***TODO*** We need an index system of some kind. Probably a start page with
+  the list of files (ahem), maybe a link to that page, and then hopefully a
+  nav system. Not sure where that comes from though.
+
   This is expected to be most of the API for people using the tool.
 
   This class handles a lot of the convention decisions. Like, we're going to
@@ -66,8 +70,7 @@ class Sourcedown(
         subdir <- subs.map(root / _)
         file <- subdir.descendants(IsFile)
         sections = ParseComments(file)
-        markdown = Rebase(sections)
-        html = ConvertMarkdown(markdown)
+        html = ConvertToHTML(file, sections)
       } yield (file, html);
     
     var pathToHTML = Map(fileIterator.toSeq: _*)
@@ -143,7 +146,7 @@ object Sourcedown {
   */
   def printOptions {
     var helpString = """
-      |Usage: java -jar sourcedown.jar [-h] [-d DIR] [-s SUB] [-t TEMPLATE] OUTPUT
+      |Usage: java -jar sourcedown.jar [-h] [-d DIR] [-s SUB1]
       |
       |Options:
       |

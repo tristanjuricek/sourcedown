@@ -1,6 +1,8 @@
 /*
   # Parsing in Sourcedown
 
+  ***TODO*** This needs to ignore strings. (duh)
+
   "Start here" to know about parsing in Souredown. 
 
   Generally speaking, we only care about comments in sourcedown. The
@@ -56,7 +58,7 @@ object ParseComments {
 
         readContent(codeStyle, reader, tokens, new ListBuffer[Char])
 
-        tokens
+        return createGroups(tokens.filter( x => !x.source.matches("\\s*") ))
     }
   }
 
@@ -71,11 +73,13 @@ object ParseComments {
 
     TODO right now this might not handle php particularly well, but we'll
     just have to see.        
+
+
   */
 
   def readContent(codeStyle: CodeStyle, reader: Reader[Char], 
                   tokens: ListBuffer[Section], buffer: ListBuffer[Char]) {
-    
+
     var pos = reader
 
     if (reader.atEnd) {
@@ -141,5 +145,51 @@ object ParseComments {
     }
 
     readComment(end, reader.rest, tokens, buffer)
+  }
+
+  /*
+    Combines sequences of single line comments. We ditch sequences of whitespace
+    only code blocks in between.
+  */
+  private def createGroups(in: Seq[Section]) : Seq[Section] = {
+
+    val buffer = new ListBuffer[Section]
+    var group = new ListBuffer[SingleLineComment]
+
+    def continue(s: Section): Unit = {
+      if (!group.isEmpty) {
+        buffer += SingleLineGroup( group )
+        group = new ListBuffer[SingleLineComment]
+      }
+      buffer += s
+    }
+
+    (0 until in.length).foreach { index =>
+      in(index) match {
+        case s:SingleLineComment =>
+          group += s
+
+        case c:Code =>             continue(c)
+        case m:MultiLineComment => continue(m)
+      }
+    }
+
+    if (!group.isEmpty) buffer += SingleLineGroup( group )
+
+    return buffer
+  }
+
+  private def isSingleLineAt(in: Seq[Section], index: Int): Boolean = {
+    
+    var isSingle = false
+
+    if (in isDefinedAt index) {
+      in(index) match {
+        case s:SingleLineComment => isSingle = true
+        case _ =>                   isSingle = false
+      }
+    }
+    
+    return isSingle
   }
 }

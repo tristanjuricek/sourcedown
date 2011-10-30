@@ -78,6 +78,7 @@ object CodeStyle {
            "cxx"   |
            "h"     |
            "java"  |
+           "scala" |
            "js"    =>
         Some(CStyle)
       

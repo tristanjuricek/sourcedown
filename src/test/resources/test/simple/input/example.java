@@ -4,7 +4,8 @@
 
 public class Foo {
     
-    // Dude, another comment
+    // This is an example of a one-line comment
+    // with two lines.
     public void doNothing() {
         System.out.println("OMG SIDE EFFECT ABORT ABORT");
     }
