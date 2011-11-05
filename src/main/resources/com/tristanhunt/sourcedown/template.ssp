@@ -1,18 +1,37 @@
 <%@ val snippet: String %>
 <%@ val path: scalax.file.Path %>
 <%@ val subdir: scalax.file.Path %>
+<%@ val navList: Seq[(String, String, Boolean)] %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <title><%= path.name %></title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <link rel="stylesheet" href="<%= subdir.segments.drop(2).map( x => ".." ).mkString("/") %>/res/style.css"></style>
+  <script type="text/javascript" 
+    src="<%= subdir.segments.drop(2).map( x => ".." ).mkString("/") %>/res/jquery.js"></script>
 </head>
 <body>
   <div id="container">
-    <div id="background"></div>
-    <h1><%= path.name %></h1>
+    <h1 class="title"><%= path.name %>&nbsp;<span class="change-link">Change</span></h1>
+    <ul id="nav-list" class="hidden">
+        #for ((path, link, isActive) <- navList)
+            #if (isActive)
+                <li class="active">${path}</li>
+            #else
+                <li><a href="${link}">${path}</a></li>
+            #end
+        #end
+    </ul>
     <table><tbody><%= xml.Unparsed(snippet) %></tbody></table>
   </div>
+<script type="text/javascript">
+$(function() {
+    var $navList = $("#nav-list"),
+        $change = $(".title .change-link");
+    
+    $change.click(function() { $navList.toggleClass("hidden") });
+});
+</script>
 </body>
 </html>

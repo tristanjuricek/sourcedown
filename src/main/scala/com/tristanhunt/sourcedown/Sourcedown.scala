@@ -1,11 +1,5 @@
 /*
-  ## Class Sourcedown
-
-  ***TODO*** We need an index system of some kind. Probably a start page with
-  the list of files (ahem), maybe a link to that page, and then hopefully a
-  nav system. Not sure where that comes from though.
-
-  This is expected to be most of the API for people using the tool.
+  This is the main application, along with a "main class" which drives the tool.
 
   This class handles a lot of the convention decisions. Like, we're going to
   just find all sources, but these sources are going to use an XHTML writing
@@ -116,7 +110,8 @@ object Sourcedown {
     var templatePath:String = "com/tristanhunt/sourcedown/template.ssp"
     var onlySubs:ListBuffer[String] = ListBuffer.empty
     var resources:ListBuffer[String] = ListBuffer(
-      "com/tristanhunt/sourcedown/res/style.css")
+      "com/tristanhunt/sourcedown/res/style.css",
+      "com/tristanhunt/sourcedown/res/jquery.js")
 
     val iter = args.iterator
     while (iter.hasNext) {

@@ -58,7 +58,7 @@ table {
    The font-size percentage is of 16px. (0.75 * 16px = 12px) */
 html { font-size:100.01%; }
 body {
-  font-size: 75%;
+  font-size: 13px;
   color: #222;
   background: #fff;
   font-family: "Myriad Pro", "Segoe UI", Arial, Helvetica, sans-serif;
@@ -106,7 +106,11 @@ address     { margin: 0 0 1.5em; font-style: italic; }
 del         { color:#666; }
 
 pre         { margin: 0; white-space: pre; }
-pre,code,tt { font: 1em "Inconsolata", "Consolas", "Menlo", 'andale mono', 'lucida console', monospace; line-height: 1.5; }
+pre,code,tt { 
+  font-size: 12px;
+  font-family: "Menlo", 'andale mono', 'lucida console', monospace; 
+  line-height: 1.5; 
+}
 
 
 /* Lists
@@ -219,4 +223,53 @@ caption     { background: #eee; }
 /*
     Some custom CSS
 */
-body { padding: 1em;}
+
+h1.title {
+  margin: 30px;
+  margin-bottom: 0px;
+}
+
+h1.title .change-link:hover {
+    text-decoration: underline;
+}
+h1.title .change-link {
+    color: #009;
+    font-size: 12px;
+    line-height: 3em;
+}
+
+table {
+  margin-top: 30px;
+}
+
+table td {
+  background-color: #efefef;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+table td:first-child {
+  background-color: white;
+  width: 510px;
+  min-width: 390px;
+}
+
+.hidden {
+  display: none;
+}
+
+#nav-list li {
+    line-height: 1.5em;
+    list-style: none outside none;
+    padding-left: 30px;
+}
+#nav-list {
+    background-color: white;
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    padding-left: 30px;
+    padding-right: 30px;
+    box-shadow: 1px 6px 4px 5px rgba(0,0,0,.3);
+    padding: 30px;
+}

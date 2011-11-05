@@ -77,7 +77,7 @@ class ScalateTemplate (
     val context = Map("path" -> path, 
                       "snippet" -> html,
                       "subdir" -> subdir(path),
-                      "fileInformation" -> fileInformation)
+                      "navList" -> navListFor(path))
     val content = engine.layout(templatePath, context)
     outputPath(path).write(content)
   }
@@ -88,6 +88,25 @@ class ScalateTemplate (
 
   def subdir(path: Path): Path = {
     outputDir / path.parent.getOrElse(Path(".")).relativize(root)    
+  }
+
+  /*
+    Convert file information into a navigation list.
+  */
+  private def navListFor(path: Path): Seq[(String, String, Boolean)] = {
+    // The start of any link to any file is a big relative path statement.
+    val toRoot = subdir(path).segments.drop(2).map( x => "..").mkString("/")
+
+    val iter =
+      for {
+        (p1, content) <- fileInformation
+        subPath = p1.relativize(root).segments.mkString("/")
+        outputFile = outputPath(p1).segments.drop(2).mkString("/")
+        link = toRoot + "/" + outputFile
+        isActive = path == p1
+      } yield (subPath, link, isActive)
+
+    iter.toSeq
   }
 }
 
