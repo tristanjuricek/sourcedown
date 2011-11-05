@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>example.scala</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="../res/style.css"></style>
+  <script type="text/javascript" 
+    src="../res/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <h1 class="title">example.scala&nbsp;<span class="change-link">Change</span></h1>
+    <ul id="nav-list" class="hidden">
+                    
+                <li class="active">dir/example.scala</li>
+                                
+                <li><a href="../example.java.html">example.java</a></li>
+                                
+                <li><a href="../example.txt.html">example.txt</a></li>
+                        </ul>
+    <table><tbody><tr><td><p>This is a Scala file
+</p></td><td><div class="highlight"><pre><span class="k">package</span> <span class="nn">dir</span>
+
+<span class="k">object</span> <span class="nc">Example</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">main</span><span class="o">(</span><span class="n">args</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">String</span><span class="o">])</span> <span class="o">{</span>
+    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Aw, yeah!&quot;</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</td></tr></tbody></table>
+  </div>
+<script type="text/javascript">
+$(function() {
+    var $navList = $("#nav-list"),
+        $change = $(".title .change-link");
+    
+    $change.click(function() { $navList.toggleClass("hidden") });
+});
+</script>
+</body>
+</html>
