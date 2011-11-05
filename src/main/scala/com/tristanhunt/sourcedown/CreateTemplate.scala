@@ -54,12 +54,13 @@ import org.fusesource.scalate._
 
 object TemplateFactory {
     
-    def apply(fileInformation: Map[Path, String], output: Path, subdir: Path,
+    def apply(fileInformation: Map[Path, String], output: Path, root: Path,
               templatePath: String): CreateTemplate = {
-      new ScalateTemplate(fileInformation, output, subdir, templatePath)
+      new ScalateTemplate(fileInformation, output, root, templatePath)
     }
 }
 
+// This is just to remove the ScalateTemplate reference in the client.
 trait CreateTemplate extends Function2[Path, String, Unit] {
   def apply(path:Path, html: String): Unit
 }
@@ -76,18 +77,38 @@ class ScalateTemplate (
   def apply(path: Path, html: String) {
     val context = Map("path" -> path, 
                       "snippet" -> html,
-                      "subdir" -> subdir(path),
+                      "toRoot" -> toRoot(path),
                       "navList" -> navListFor(path))
     val content = engine.layout(templatePath, context)
     outputPath(path).write(content)
   }
 
   def outputPath(path: Path): Path = {
-    subdir(path) / (path.name + ".html")
+    Path( (outputDir / subpath(path)).path + ".html" )
   }
 
-  def subdir(path: Path): Path = {
-    outputDir / path.parent.getOrElse(Path(".")).relativize(root)    
+  def toRoot(path: Path): String = {
+
+    path.parent match {
+      
+      case None => "."
+
+      case Some(parent) => 
+        val toRoot =
+          subpath(parent).segments.filter( x => !x.isEmpty ).map( x =>  ".." ).mkString("/")
+        if (toRoot.isEmpty) "." else toRoot
+    }
+  }
+
+  /* If we don't remove the . we have null flying around unabashed */
+  def absoluteOf(p: Path): Path = {
+    val absoluted:Path = p.toAbsolute
+    val start = absoluted.root.map(x => x.path).getOrElse("")
+    Path(start + absoluted.segments.filter(x => x != ".").mkString("/"))
+  }
+
+  def subpath(path: Path): Path = {
+    absoluteOf(path).relativize(absoluteOf(root))
   }
 
   /*
@@ -95,14 +116,13 @@ class ScalateTemplate (
   */
   private def navListFor(path: Path): Seq[(String, String, Boolean)] = {
     // The start of any link to any file is a big relative path statement.
-    val toRoot = subdir(path).segments.drop(2).map( x => "..").mkString("/")
+    val toRootString = toRoot(path)
 
     val iter =
       for {
         (p1, content) <- fileInformation
-        subPath = p1.relativize(root).segments.mkString("/")
-        outputFile = outputPath(p1).segments.drop(2).mkString("/")
-        link = toRoot + "/" + outputFile
+        subPath = subpath(p1).path
+        link = toRootString + "/" + subPath + ".html"
         isActive = path == p1
       } yield (subPath, link, isActive)
 

@@ -43,8 +43,8 @@ object RunSourcedownTests {
       var outputFolder = prepareOutputFolder(testFolder)
 
       var execTest = Process("java -jar " + sourcedownBuild + 
-                             " -o " + outputFolder +
-                             " -d " + testFolder)
+                             " -o " + outputFolder.path +
+                             " -d " + (testFolder / "input").path)
   
       var result = execTest.run(true)
 
