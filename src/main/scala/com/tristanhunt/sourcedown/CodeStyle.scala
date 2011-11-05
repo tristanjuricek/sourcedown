@@ -99,21 +99,38 @@ object CodeStyle {
 }
 
 trait CodeStyle {
+  /*
+    Most languages have a simple character sequence to start a single comment
+    line.
+  */
   def singleLineStart: Set[String]
+
+  /*
+    Start and end markers for comments.
+  */
   def multiLineEnds: Set[(String, String)]
+
+  /*
+    Strings and text are usually indicated via a single or double quote, with
+    a particular group of escape characters.
+  */
+  def stringDelimiters: Set[(String, String, Set[String])]
 }
 
 case object CStyle extends CodeStyle {
   val singleLineStart = Set("//")
   val multiLineEnds = Set( ("/*", "*/") )
+  val stringDelimiters = Set( ("\"", "\"", Set("\\")) )
 }
 
 case object ShellStyle extends CodeStyle {
   val singleLineStart = Set("#")
   val multiLineEnds:Set[(String, String)] = Set.empty
+  val stringDelimiters = Set( ("'", "'", Set("\\")), ("\"", "\"", Set("\\")) )
 }
 
 case object XMLStyle extends CodeStyle {
   val singleLineStart:Set[String] = Set.empty
-  val multiLineEnds = Set( ("<!--", "-->") )    
+  val multiLineEnds = Set( ("<!--", "-->") )
+  val stringDelimiters = Set( ("'", "'", Set("\\")), ("\"", "\"", Set("\\")) )
 }

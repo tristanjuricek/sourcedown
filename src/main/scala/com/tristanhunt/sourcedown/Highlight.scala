@@ -22,9 +22,9 @@ object Pygmentize extends Function2[String,String,String] {
     Process("pygmentize -f html -l " + ext ) #< asStream(source) !!
  }
 
- def asStream(source: String): InputStream = {
-   new ByteArrayInputStream( source.getBytes )
- }
+  def asStream(source: String): InputStream = {
+    new ByteArrayInputStream( source.getBytes )
+  }
 }
 
 

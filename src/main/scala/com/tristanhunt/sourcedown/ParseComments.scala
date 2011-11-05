@@ -89,6 +89,18 @@ object ParseComments {
 
     buffer += pos.first
 
+    val string = for {
+      (start, end, escape) <- codeStyle.stringDelimiters
+      if (buffer.endsWith(start))
+    } yield (start, end, escape)
+
+    if (!string.isEmpty) {
+      var (start, end, escape) = string.head
+      val nextPos = readString(end, escape, reader.rest, tokens, buffer)
+      readContent(codeStyle, nextPos, tokens, buffer)
+      return
+    }
+
     val singleLine = for {
       start <- codeStyle.singleLineStart
       if (buffer.endsWith(start))
@@ -101,7 +113,7 @@ object ParseComments {
         tokens += Code(content)
       buffer.clear
       val (comment, nextPos) = 
-        readComment("\n", pos.rest, tokens, ListBuffer[Char](start:_*))
+        readComment("\n", pos.rest, tokens, ListBuffer[Char](start:_*), codeStyle)
       tokens += SingleLineComment(comment, start)
       readContent(codeStyle, nextPos, tokens, buffer)   
       return
@@ -119,7 +131,7 @@ object ParseComments {
         tokens += Code(content)
       buffer.clear
       val (comment, nextPos) = 
-        readComment(end, pos.rest, tokens, ListBuffer[Char](start:_*))
+        readComment(end, pos.rest, tokens, ListBuffer[Char](start:_*), codeStyle)
       tokens += MultiLineComment(comment, start, end)
       readContent(codeStyle, nextPos, tokens, buffer)
       return
@@ -133,18 +145,31 @@ object ParseComments {
     new String(seq.toArray)
 
   private def readComment(end: String, reader: Reader[Char], 
-              tokens: ListBuffer[Section], buffer: ListBuffer[Char]) : (String, Reader[Char]) = {
+              tokens: ListBuffer[Section], buffer: ListBuffer[Char],
+              codeStyle: CodeStyle) : (String, Reader[Char]) = {
     if (reader.atEnd) {
       return (buffer, reader)
     }
 
     buffer += reader.first
 
+    var nextPos = reader.rest
+
+    val string = for {
+      (start, end, escape) <- codeStyle.stringDelimiters
+      if (buffer.endsWith(start))
+    } yield (start, end, escape)
+
+    if (!string.isEmpty) {
+      var (start, end, escape) = string.head
+      nextPos = readString(end, escape, reader.rest, tokens, buffer)
+    }
+
     if (buffer.endsWith(end)) {
       return (buffer, reader.rest)
     }
 
-    readComment(end, reader.rest, tokens, buffer)
+    readComment(end, nextPos, tokens, buffer, codeStyle)
   }
 
   /*
@@ -191,5 +216,24 @@ object ParseComments {
     }
     
     return isSingle
+  }
+
+  private def readString(end: String, escape: Set[String], 
+                         reader: Reader[Char],
+                         tokens: ListBuffer[Section], 
+                         buffer: ListBuffer[Char]): Reader[Char] = {
+      if (reader.atEnd) {
+        return reader
+      }
+
+      buffer += reader.first
+
+      if (buffer.endsWith(end)) {
+        if ( escape.find( x => buffer.endsWith(x + end)).isEmpty ) {
+          return reader.rest          
+        }
+      }
+
+      readString(end, escape, reader.rest, tokens, buffer)
   }
 }
