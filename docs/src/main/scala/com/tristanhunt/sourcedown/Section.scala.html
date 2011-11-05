@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Section.scala</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="../../../../../../res/style.css"></style>
+  <script type="text/javascript" 
+    src="../../../../../../res/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <h1 class="title">Section.scala&nbsp;<span class="change-link">Change</span></h1>
+    <ul id="nav-list" class="hidden">
+                    
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/CodeStyle.scala.html">src/main/scala/com/tristanhunt/sourcedown/CodeStyle.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ParseComments.scala.html">src/main/scala/com/tristanhunt/sourcedown/ParseComments.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/CreateTemplate.scala.html">src/main/scala/com/tristanhunt/sourcedown/CreateTemplate.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/TestHelper.scala.html">src/test/scala/com/tristanhunt/sourcedown/TestHelper.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ConvertMarkdown.scala.html">src/main/scala/com/tristanhunt/sourcedown/ConvertMarkdown.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/CreateTemplateSpec.scala.html">src/test/scala/com/tristanhunt/sourcedown/CreateTemplateSpec.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/RunSourcedownTests.scala.html">src/test/scala/com/tristanhunt/sourcedown/RunSourcedownTests.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala.html">src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Highlight.scala.html">src/main/scala/com/tristanhunt/sourcedown/Highlight.scala</a></li>
+                                
+                <li class="active">src/main/scala/com/tristanhunt/sourcedown/Section.scala</li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ConvertToHTML.scala.html">src/main/scala/com/tristanhunt/sourcedown/ConvertToHTML.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/ParseCommentsSpec.scala.html">src/test/scala/com/tristanhunt/sourcedown/ParseCommentsSpec.scala</a></li>
+                        </ul>
+    <table><tbody><tr><td><h1>The Parse Tree of Source Files</h1><p>For this version, it's outrageously simple.
+</p></td><td><div class="highlight"><pre><span class="k">package</span> <span class="nn">com.tristanhunt.sourcedown</span>
+
+<span class="k">trait</span> <span class="nc">Section</span> <span class="o">{</span>
+  
+</pre></div>
+</td></tr><tr><td><p>Source is actually the comment line including any markers
+</p></td><td><div class="highlight"><pre>  <span class="k">def</span> <span class="n">source</span><span class="k">:</span> <span class="kt">String</span>
+
+  
+</pre></div>
+</td></tr><tr><td><p>Return the source minus any markers.
+</p></td><td><div class="highlight"><pre>  <span class="k">def</span> <span class="n">trim</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">source</span>
+<span class="o">}</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Code</span><span class="o">(</span><span class="k">val</span> <span class="n">source</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Section</span>
+</pre></div>
+</td></tr><tr><td><p>The source of a single line comment is terminated by a newline. In cases that
+it's not, you'd have a multiline comment.
+</p></td><td><div class="highlight"><pre><span class="k">case</span> <span class="k">class</span> <span class="nc">SingleLineComment</span><span class="o">(</span><span class="k">val</span> <span class="n">source</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="k">val</span> <span class="n">start</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> 
+  <span class="k">extends</span> <span class="nc">Section</span> <span class="o">{</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="n">trim</span> <span class="k">=</span> <span class="n">source</span><span class="o">.</span><span class="n">substring</span><span class="o">(</span><span class="n">start</span><span class="o">.</span><span class="n">length</span><span class="o">).</span><span class="n">trim</span>
+<span class="o">}</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">SingleLineGroup</span><span class="o">(</span><span class="k">val</span> <span class="n">comments</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">SingleLineComment</span><span class="o">])</span> 
+<span class="k">extends</span> <span class="nc">Section</span> <span class="o">{</span>
+  
+  <span class="k">def</span> <span class="n">source</span> <span class="k">=</span> <span class="n">comments</span><span class="o">.</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">)</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="n">trim</span> <span class="k">=</span> <span class="n">comments</span><span class="o">.</span><span class="n">map</span><span class="o">(</span> <span class="n">x</span> <span class="k">=&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">trim</span> <span class="o">).</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;\n&quot;</span><span class="o">)</span>
+<span class="o">}</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">MultiLineComment</span><span class="o">(</span><span class="k">val</span> <span class="n">source</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="k">val</span> <span class="n">start</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> 
+                            <span class="k">val</span> <span class="n">end</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Section</span> <span class="o">{</span>
+
+  
+</pre></div>
+</td></tr><tr><td><p>TODO this just feels wrong, but I'm not sure where to stick it.</p></td><td><div class="highlight"><pre>  <span class="k">var</span> <span class="n">tabWidth</span> <span class="k">=</span> <span class="mi">4</span>
+
+  
+</pre></div>
+</td></tr><tr><td><p>With a multiline comment you need to try to figure out where the &quot;real&quot;
+content starts in the comment.
+</p><p>Keep in mind the tendency to see strings like &quot;*&quot; preceding content like
+you see in java:
+</p><p>/**
+* I am a comment
+</p></td><td><div class="highlight"><pre>    
+    <span class="nc">Here</span><span class="o">,</span> <span class="n">what</span> <span class="n">we</span> <span class="n">want</span> <span class="n">as</span> <span class="n">content</span> <span class="n">is</span> <span class="n">just</span> <span class="n">the</span> <span class="s">&quot;I am a comment\n&quot;</span> <span class="n">bit</span><span class="o">.</span>
+
+    <span class="nc">Another</span> <span class="n">example</span><span class="k">:</span>
+
+      <span class="kt">&lt;!--</span> <span class="kt">Multiline</span> <span class="kt">possible</span> <span class="kt">comment</span> <span class="kt">--&gt;</span>
+
+    <span class="nc">This</span> <span class="n">should</span> <span class="n">be</span> <span class="s">&quot;Multiline possible comment&quot;</span><span class="o">.</span> <span class="nc">As</span> <span class="n">a</span> <span class="n">general</span> <span class="n">rule</span><span class="o">,</span> <span class="n">we</span><span class="-Symbol">&#39;ll</span>
+    <span class="n">probably</span> <span class="n">ensure</span> <span class="n">each</span> <span class="n">rebased</span> <span class="n">block</span> <span class="n">ends</span> <span class="k">with</span> <span class="n">two</span> <span class="n">newlines</span><span class="o">.</span>
+    
+    <span class="nc">Tabs</span> <span class="n">are</span> <span class="n">problematic</span><span class="o">.</span> <span class="nc">For</span> <span class="n">some</span> <span class="n">kind</span> <span class="n">of</span> <span class="n">sanity</span><span class="o">,</span> <span class="n">we</span><span class="-Symbol">&#39;ll</span> <span class="n">replace</span> <span class="n">the</span> <span class="n">tab</span> 
+    <span class="n">width</span> <span class="n">using</span> <span class="n">a</span> <span class="n">general</span> <span class="n">policy</span> <span class="o">(</span><span class="n">which</span> <span class="n">is</span> <span class="n">probably</span> <span class="kc">true</span> <span class="n">across</span> <span class="n">all</span> <span class="n">files</span> <span class="n">in</span>
+    <span class="n">the</span> <span class="n">project</span><span class="o">).</span>
+  <span class="o">*/</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">trim</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="k">var</span> <span class="n">startIndex</span> <span class="k">=</span> <span class="n">start</span><span class="o">.</span><span class="n">length</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">start</span> <span class="o">==</span> <span class="s">&quot;/*&quot;</span> <span class="o">&amp;&amp;</span> <span class="n">source</span><span class="o">.</span><span class="n">startsWith</span><span class="o">(</span><span class="s">&quot;/**&quot;</span><span class="o">))</span> <span class="o">{</span>
+      <span class="n">startIndex</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="o">}</span>
+    <span class="k">var</span> <span class="n">lines</span> <span class="k">=</span> <span class="n">source</span><span class="o">.</span><span class="n">substring</span><span class="o">(</span><span class="n">startIndex</span><span class="o">,</span> <span class="n">source</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="n">end</span><span class="o">.</span><span class="n">length</span><span class="o">)</span>
+              <span class="o">.</span><span class="n">replace</span><span class="o">(</span><span class="s">&quot;\t&quot;</span><span class="o">,</span> <span class="s">&quot; &quot;</span> <span class="o">*</span> <span class="n">tabWidth</span> 
+</pre></div>
+</td></tr><tr><td><p>FIXME
+</p></td><td><div class="highlight"><pre><span class="o">)</span>
+              <span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">&quot;\n&quot;</span><span class="o">)</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">lines</span><span class="o">.</span><span class="n">length</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+      
+</pre></div>
+</td></tr><tr><td><p>Drop the leading and trailing line if they don't have much
+interesting content, which is generally true.</p></td><td><div class="highlight"><pre>      <span class="k">if</span> <span class="o">(</span><span class="n">lines</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">trim</span><span class="o">.</span><span class="n">isEmpty</span><span class="o">)</span>
+        <span class="n">lines</span> <span class="k">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">drop</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">lines</span><span class="o">.</span><span class="n">last</span><span class="o">.</span><span class="n">trim</span><span class="o">.</span><span class="n">isEmpty</span><span class="o">)</span>
+        <span class="n">lines</span> <span class="k">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">dropRight</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+      
+      
+</pre></div>
+</td></tr><tr><td><p>Look at the rest of the content to see if we notice a prefix.</p></td><td><div class="highlight"><pre>      <span class="n">findPrefix</span><span class="o">(</span><span class="n">lines</span><span class="o">,</span> <span class="n">start</span><span class="o">).</span><span class="n">foreach</span> <span class="o">{</span> <span class="n">prefix</span> <span class="k">=&gt;</span>
+        <span class="n">lines</span> <span class="k">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">map</span><span class="o">(</span> <span class="n">line</span> <span class="k">=&gt;</span> <span class="n">line</span><span class="o">.</span><span class="n">drop</span><span class="o">(</span><span class="n">prefix</span><span class="o">.</span><span class="n">length</span><span class="o">)</span> <span class="o">)</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">lines</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">_</span><span class="o">.</span><span class="n">trim</span><span class="o">).</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;\n&quot;</span><span class="o">)</span> <span class="o">+</span> <span class="s">&quot;\n\n&quot;</span>
+  <span class="o">}</span>
+
+  
+</pre></div>
+</td></tr><tr><td><p>If there is more than one line to read, we'll try to discover what the
+prefix might be, since people can do things like this:
+</p><!--
+- A two-line
+- multiline comment
+-->
+<p>Keep in mind, however, the tendency for using multline comments using
+one of the characters wihtin the starting sequence. If there's only
+one line, we'll start with a guess using the first character that
+is not in the starting sequence.
+</p><p>If we don't discover something, we'll return <code>None</code>. Otherwise it will
+be <code>Some(prefix)</code>.
+</p></td><td><div class="highlight"><pre>  <span class="k">private</span> <span class="k">def</span> <span class="n">findPrefix</span><span class="o">(</span><span class="n">lines</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">String</span><span class="o">],</span> <span class="n">start</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">find</span><span class="o">(</span> <span class="n">stringIsntEmpty</span> <span class="k">_</span> <span class="o">).</span><span class="n">flatMap</span> <span class="o">{</span> <span class="n">line</span> <span class="k">=&gt;</span>
+      <span class="k">val</span> <span class="n">idx</span> <span class="k">=</span> <span class="n">line</span><span class="o">.</span><span class="n">indexWhere</span><span class="o">(</span> <span class="n">charIsNotIn</span><span class="o">(</span><span class="n">start</span><span class="o">)</span> <span class="o">)</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">idx</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> 
+        <span class="nc">Some</span><span class="o">(</span><span class="n">line</span><span class="o">.</span><span class="n">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="n">idx</span><span class="o">))</span>
+      <span class="k">else</span>
+        <span class="nc">None</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="k">private</span> <span class="k">def</span> <span class="n">charIsNotIn</span><span class="o">(</span><span class="n">str</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Char</span> <span class="o">=&gt;</span> <span class="nc">Boolean</span> <span class="k">=</span> 
+    <span class="n">ch</span> <span class="k">=&gt;</span> <span class="o">!</span><span class="n">ch</span><span class="o">.</span><span class="n">isWhitespace</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="o">(</span><span class="n">ch</span><span class="o">)</span>
+
+  <span class="k">private</span> <span class="k">def</span> <span class="n">stringIsntEmpty</span><span class="o">(</span><span class="n">str</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
+    <span class="o">!</span><span class="n">str</span><span class="o">.</span><span class="n">trim</span><span class="o">.</span><span class="n">isEmpty</span>
+<span class="o">}</span>
+</pre></div>
+</td></tr></tbody></table>
+  </div>
+<script type="text/javascript">
+$(function() {
+    var $navList = $("#nav-list"),
+        $change = $(".title .change-link");
+    
+    $change.click(function() { $navList.toggleClass("hidden") });
+});
+</script>
+</body>
+</html>

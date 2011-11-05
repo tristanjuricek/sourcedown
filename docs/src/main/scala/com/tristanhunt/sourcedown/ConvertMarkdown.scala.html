@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ConvertMarkdown.scala</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="../../../../../../res/style.css"></style>
+  <script type="text/javascript" 
+    src="../../../../../../res/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <h1 class="title">ConvertMarkdown.scala&nbsp;<span class="change-link">Change</span></h1>
+    <ul id="nav-list" class="hidden">
+                    
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/CodeStyle.scala.html">src/main/scala/com/tristanhunt/sourcedown/CodeStyle.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ParseComments.scala.html">src/main/scala/com/tristanhunt/sourcedown/ParseComments.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/CreateTemplate.scala.html">src/main/scala/com/tristanhunt/sourcedown/CreateTemplate.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/TestHelper.scala.html">src/test/scala/com/tristanhunt/sourcedown/TestHelper.scala</a></li>
+                                
+                <li class="active">src/main/scala/com/tristanhunt/sourcedown/ConvertMarkdown.scala</li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/CreateTemplateSpec.scala.html">src/test/scala/com/tristanhunt/sourcedown/CreateTemplateSpec.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/RunSourcedownTests.scala.html">src/test/scala/com/tristanhunt/sourcedown/RunSourcedownTests.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala.html">src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Highlight.scala.html">src/main/scala/com/tristanhunt/sourcedown/Highlight.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Section.scala.html">src/main/scala/com/tristanhunt/sourcedown/Section.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ConvertToHTML.scala.html">src/main/scala/com/tristanhunt/sourcedown/ConvertToHTML.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/ParseCommentsSpec.scala.html">src/test/scala/com/tristanhunt/sourcedown/ParseCommentsSpec.scala</a></li>
+                        </ul>
+    <table><tbody><tr><td><h1>Markdown conversion using knockoff</h1><p>The goal of this is an XHTML snippet based on &quot;rebased&quot; markdown. This
+snippet will probably be applied within a template (somewhere) to create
+the final website file.
+</p><p>Custom conversion of the XHTML is allowed by assigning a different
+discounter to the <code>KnockoffConversion</code> object.
+</p></td><td><div class="highlight"><pre><span class="k">package</span> <span class="nn">com.tristanhunt.sourcedown</span>
+
+<span class="k">import</span> <span class="nn">scala.xml.Node</span>
+<span class="k">import</span> <span class="nn">com.tristanhunt.knockoff.DefaultDiscounter</span>
+
+<span class="k">object</span> <span class="nc">ConvertMarkdown</span> <span class="o">{</span>
+    
+  <span class="k">var</span> <span class="n">discounter</span> <span class="k">=</span> <span class="nc">DefaultDiscounter</span>
+
+  <span class="k">def</span> <span class="n">apply</span><span class="o">(</span><span class="n">markdown</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Node</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">discounter</span><span class="o">.</span><span class="n">toXHTML</span><span class="o">(</span> <span class="n">discounter</span><span class="o">.</span><span class="n">knockoff</span><span class="o">(</span><span class="n">markdown</span><span class="o">)</span> <span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</td></tr></tbody></table>
+  </div>
+<script type="text/javascript">
+$(function() {
+    var $navList = $("#nav-list"),
+        $change = $(".title .change-link");
+    
+    $change.click(function() { $navList.toggleClass("hidden") });
+});
+</script>
+</body>
+</html>

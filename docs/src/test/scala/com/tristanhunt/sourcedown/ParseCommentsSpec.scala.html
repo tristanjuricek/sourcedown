@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ParseCommentsSpec.scala</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="../../../../../../res/style.css"></style>
+  <script type="text/javascript" 
+    src="../../../../../../res/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <h1 class="title">ParseCommentsSpec.scala&nbsp;<span class="change-link">Change</span></h1>
+    <ul id="nav-list" class="hidden">
+                    
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/CodeStyle.scala.html">src/main/scala/com/tristanhunt/sourcedown/CodeStyle.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ParseComments.scala.html">src/main/scala/com/tristanhunt/sourcedown/ParseComments.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/CreateTemplate.scala.html">src/main/scala/com/tristanhunt/sourcedown/CreateTemplate.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/TestHelper.scala.html">src/test/scala/com/tristanhunt/sourcedown/TestHelper.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ConvertMarkdown.scala.html">src/main/scala/com/tristanhunt/sourcedown/ConvertMarkdown.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/CreateTemplateSpec.scala.html">src/test/scala/com/tristanhunt/sourcedown/CreateTemplateSpec.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/RunSourcedownTests.scala.html">src/test/scala/com/tristanhunt/sourcedown/RunSourcedownTests.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala.html">src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Highlight.scala.html">src/main/scala/com/tristanhunt/sourcedown/Highlight.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Section.scala.html">src/main/scala/com/tristanhunt/sourcedown/Section.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ConvertToHTML.scala.html">src/main/scala/com/tristanhunt/sourcedown/ConvertToHTML.scala</a></li>
+                                
+                <li class="active">src/test/scala/com/tristanhunt/sourcedown/ParseCommentsSpec.scala</li>
+                        </ul>
+    <table><tbody><tr><td><h1>ParseCommentsSpec</h1><p>This is just a few checks I'm using to speed up my dev cycle. Not an exhaustive
+specification.
+</p></td><td><div class="highlight"><pre><span class="k">package</span> <span class="nn">com.tristanhunt.sourcedown</span>
+
+<span class="k">import</span> <span class="nn">org.scalatest.Spec</span>
+
+<span class="k">class</span> <span class="nc">ParseCommentsSpec</span> <span class="k">extends</span> <span class="nc">Spec</span> <span class="k">with</span> <span class="nc">TestHelper</span> <span class="o">{</span>
+  
+  <span class="n">describe</span><span class="o">(</span><span class="s">&quot;ParseComments&quot;</span><span class="o">)</span> <span class="o">{</span>
+    
+    <span class="n">it</span><span class="o">(</span><span class="s">&quot;should properly join two single line comments as a group of lines&quot;</span><span class="o">)</span> <span class="o">{</span>
+      
+      <span class="k">val</span> <span class="n">sections</span> <span class="k">=</span> <span class="nc">ParseComments</span><span class="o">(</span><span class="n">tempContents</span><span class="o">(</span><span class="s">&quot;.java&quot;</span><span class="o">,</span>
+        <span class="s">&quot;&quot;&quot;    // **TODO** Fix this</span>
+<span class="s">          |    // Example of a second line&quot;&quot;&quot;</span><span class="o">.</span><span class="n">stripMargin</span><span class="o">))</span>
+
+      <span class="n">assert</span><span class="o">(</span><span class="n">sections</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">trim</span> <span class="o">===</span> <span class="s">&quot;&quot;&quot;**TODO** Fix this</span>
+<span class="s">                                      |Example of a second line&quot;&quot;&quot;</span><span class="o">.</span><span class="n">stripMargin</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="n">it</span><span class="o">(</span><span class="s">&quot;should ignore comment markers in strings in C Style declarations, &quot;</span> <span class="o">+</span> 
+       <span class="s">&quot;even when in a commented out section&quot;</span><span class="o">)</span> <span class="o">{</span>
+      
+      <span class="k">val</span> <span class="n">sections</span> <span class="k">=</span> <span class="nc">ParseComments</span><span class="o">(</span><span class="n">tempContents</span><span class="o">(</span><span class="s">&quot;.c&quot;</span><span class="o">,</span> 
+        <span class="s">&quot;&quot;&quot;void func(int x) {</span>
+<span class="s">          |    /* let&#39;s pretend this is commented out. It should look funky.</span>
+<span class="s">          |    println(&quot;</span><span class="n">x</span> <span class="n">could</span> <span class="n">be</span> 
+</pre></div>
+</td></tr><tr><td><p>divided or <em>/ whatever&quot;);
+          |    </em>/
+          |    // And this should not be commented out
+          |    println(&quot;x // 0 is \&quot; almost as strange as /*&quot;);</p></td><td><div class="highlight"><pre>          <span class="o">|}</span><span class="s">&quot;&quot;&quot;.stripMargin))</span>
+
+<span class="s">      val comment = sections(1).asInstanceOf[MultiLineComment]</span>
+<span class="s">      val code = sections(3).asInstanceOf[Code]</span>
+
+<span class="s">      assert(comment.trim.trim === </span>
+<span class="s">        &quot;&quot;&quot;</span><span class="n">let</span><span class="-Symbol">&#39;s</span> <span class="n">pretend</span> <span class="k">this</span> <span class="n">is</span> <span class="n">commented</span> <span class="n">out</span><span class="o">.</span> <span class="nc">It</span> <span class="n">should</span> <span class="n">look</span> <span class="n">funky</span><span class="o">.</span>
+          <span class="o">|</span><span class="n">println</span><span class="o">(</span><span class="s">&quot;x could be // divided or */ whatever&quot;</span><span class="o">);</span><span class="s">&quot;&quot;&quot;.stripMargin)</span>
+<span class="s">      </span>
+<span class="s">      assert(code.trim.trim === </span>
+<span class="s">        &quot;</span><span class="n">println</span><span class="o">(\</span><span class="s">&quot;x // 0 is \\\&quot; almost as strange as /*\&quot;);\n}&quot;</span><span class="o">)</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</td></tr></tbody></table>
+  </div>
+<script type="text/javascript">
+$(function() {
+    var $navList = $("#nav-list"),
+        $change = $(".title .change-link");
+    
+    $change.click(function() { $navList.toggleClass("hidden") });
+});
+</script>
+</body>
+</html>

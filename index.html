@@ -28,7 +28,11 @@
 
 <h4><a href="#About">Sourcedown</a></h4>
 
+<h4><a href="">Download</a></h4>
+
 <h4><a href="docs/src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala.html">Source</a></h4>
+
+<h4><a href="docs/scaladoc/index.html">API</a></h4>
 
 </div>
 
@@ -37,6 +41,26 @@
 <h1 id="About"> Sourcedown </h1>
 
 <p> It's ill-Literate programming for the masses! </p>
+
+<p> Will take your source hierarchy and generate a bunch of HTML files. This
+takes the <a href="http://jashkenas.github.com/docco/">Docco</a> approach and
+starts to open it up to new languages. </p>
+
+<h2 id="Running"> Running Sourcedown </h2>
+
+<p> This is my typical run: </p>
+
+<pre><code>java -jar sourcedown.jar -s src/main/scala -o docs
+
+</code></pre>
+
+<p> This will convert all files under the <code>src/main/scala</code> into 
+HTML files underneath the <code>docs</code> folder. This will preserve files, so
+the first file you'll see will be in the format 
+<code>src/main/scala/{package}/{file}.html</code>. </p>
+
+<p> Note that I'm typically running this within the root of the project I'm working on.
+And, that <code>sourcedown.jar</code> can be wherever.</p>
 
 </div>
 </body>

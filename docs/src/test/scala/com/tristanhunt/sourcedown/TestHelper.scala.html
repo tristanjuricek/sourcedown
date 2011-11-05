@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TestHelper.scala</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="../../../../../../res/style.css"></style>
+  <script type="text/javascript" 
+    src="../../../../../../res/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <h1 class="title">TestHelper.scala&nbsp;<span class="change-link">Change</span></h1>
+    <ul id="nav-list" class="hidden">
+                    
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/CodeStyle.scala.html">src/main/scala/com/tristanhunt/sourcedown/CodeStyle.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ParseComments.scala.html">src/main/scala/com/tristanhunt/sourcedown/ParseComments.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/CreateTemplate.scala.html">src/main/scala/com/tristanhunt/sourcedown/CreateTemplate.scala</a></li>
+                                
+                <li class="active">src/test/scala/com/tristanhunt/sourcedown/TestHelper.scala</li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ConvertMarkdown.scala.html">src/main/scala/com/tristanhunt/sourcedown/ConvertMarkdown.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/CreateTemplateSpec.scala.html">src/test/scala/com/tristanhunt/sourcedown/CreateTemplateSpec.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/RunSourcedownTests.scala.html">src/test/scala/com/tristanhunt/sourcedown/RunSourcedownTests.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala.html">src/main/scala/com/tristanhunt/sourcedown/Sourcedown.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Highlight.scala.html">src/main/scala/com/tristanhunt/sourcedown/Highlight.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/Section.scala.html">src/main/scala/com/tristanhunt/sourcedown/Section.scala</a></li>
+                                
+                <li><a href="../../../../../../src/main/scala/com/tristanhunt/sourcedown/ConvertToHTML.scala.html">src/main/scala/com/tristanhunt/sourcedown/ConvertToHTML.scala</a></li>
+                                
+                <li><a href="../../../../../../src/test/scala/com/tristanhunt/sourcedown/ParseCommentsSpec.scala.html">src/test/scala/com/tristanhunt/sourcedown/ParseCommentsSpec.scala</a></li>
+                        </ul>
+    <table><tbody><tr><td></td><td><div class="highlight"><pre><span class="k">package</span> <span class="nn">com.tristanhunt.sourcedown</span>
+
+<span class="k">import</span> <span class="nn">scalax.file.Path</span>
+
+<span class="k">trait</span> <span class="nc">TestHelper</span> <span class="o">{</span>
+  
+  <span class="k">def</span> <span class="n">tempContents</span><span class="o">(</span><span class="n">extension</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">contents</span><span class="k">:</span><span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Path</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="n">path</span> <span class="k">=</span> <span class="nc">Path</span><span class="o">.</span><span class="n">createTempFile</span><span class="o">(</span><span class="n">suffix</span> <span class="k">=</span> <span class="n">extension</span><span class="o">)</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">write</span><span class="o">(</span><span class="n">contents</span><span class="o">)</span>
+    <span class="k">return</span> <span class="n">path</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</td></tr></tbody></table>
+  </div>
+<script type="text/javascript">
+$(function() {
+    var $navList = $("#nav-list"),
+        $change = $(".title .change-link");
+    
+    $change.click(function() { $navList.toggleClass("hidden") });
+});
+</script>
+</body>
+</html>
