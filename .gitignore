@@ -2,3 +2,4 @@
 build
 sourcedown.sublime-*
 docs
+target/
