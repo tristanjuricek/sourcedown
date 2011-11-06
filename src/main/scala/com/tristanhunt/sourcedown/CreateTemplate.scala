@@ -126,7 +126,7 @@ class ScalateTemplate (
         isActive = path == p1
       } yield (subPath, link, isActive)
 
-    iter.toSeq
+    iter.toSeq.sorted
   }
 }
 
